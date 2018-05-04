@@ -1,0 +1,84 @@
+##cluster analysis
+##data1: store sales in Diageo sample (82)
+##data2: store sales in Retail sample (102)
+
+ventas <- read.csv("C:/Users/Khaleesi/Downloads/TiendasDiageo.csv")
+ventas_D1 <- subset(ventas, ventas$Grupo =="Diageo")
+ventas_R1 <- subset(ventas, ventas$Grupo =="Retail")
+
+ventas$Ventas.enero.feb.esc <-  ventas$Ventas.ene.feb/1000000
+ventas_R1$Ventas.enero.feb.esc <-  ventas_R1$Ventas.enero.feb/1000000
+
+###########################
+###   DIAGEO ANALYSIS   ###
+###########################
+
+#Elbow Method for finding the optimal number of clusters
+set.seed(123)
+# Compute and plot wss for k = 2 to k = 15.
+k.max <- 15
+data <- ventas$Ventas.ene.feb
+wss <- sapply(1:k.max, 
+              function(k){kmeans(data, k, nstart=50,iter.max = 15 )$tot.withinss})
+wss
+plot(1:k.max, wss,
+     type="b", pch = 19, frame = FALSE, 
+     xlab="Number of clusters K",
+     ylab="Total within-clusters sum of squares")
+
+##optimal number of clusters: 5
+##k-means in ventas_D
+diageo.clust <- kmeans(ventas$Ventas.ene.feb, 5)
+center <- diageo.clust$centers
+center <- sort(center)
+
+diageo.clust <- kmeans(ventas$Ventas.ene.feb, center)
+diageo.clust$size
+
+clus <- as.factor(diageo.clust$cluster)
+ventas <- cbind(ventas, clus)
+
+##clusters diageo box-plot
+x11()
+ggplot(ventas, aes(x=clus, y=Ventas.enero.feb.esc, color=clus)) + geom_boxplot() +
+  stat_summary(fun.y=mean, geom="point", shape=3, size=2) + 
+  labs(title = "clusters Diageo", x="Cluster", y="Ventas ene-feb (mill COP)")
+
+##store sales plot
+x11()
+ggplot(ventas_D1, aes(x=seq(1:82), y=Ventas.enero.feb.esc, color=clus)) + geom_point() +
+  labs(title = "tiendas Diageo", x="Cluster", y="Ventas ene-feb (mill COP)")
+
+
+##########################################
+##           RETAIL ANALYSIS            ##
+##########################################
+#Elbow Method for finding the optimal number of clusters
+set.seed(123)
+# Compute and plot wss for k = 2 to k = 15.
+k.max <- 15
+data <- ventas_R1$Ventas.enero.feb
+wss <- sapply(1:k.max, 
+              function(k){kmeans(data, k, nstart=50,iter.max = 15 )$tot.withinss})
+wss
+plot(1:k.max, wss,
+     type="b", pch = 19, frame = FALSE, 
+     xlab="Number of clusters K",
+     ylab="Total within-clusters sum of squares")
+
+##optimal number of clusters: 5
+##k-means in ventas_D
+diageo.clustR <- kmeans(ventas_D1$Ventas.enero.feb, 5)
+center <- diageo.clustR$centers
+center <- sort(center)
+
+diageo.clustR <- kmeans(ventas_R1$Ventas.enero.feb, center)
+diageo.clustR$size
+
+clus <- as.factor(diageo.clustR$cluster)
+ventas_R1 <- cbind(ventas_R1, clus)
+
+x11()
+ggplot(ventas_R1, aes(x=clus, y=Ventas.enero.feb.esc, color=clus)) + geom_boxplot() +
+  stat_summary(fun.y=mean, geom="point", shape=3, size=2) + 
+  labs(title = "clusters Retail", x="Cluster", y="Ventas ene-feb (mill COP)")
