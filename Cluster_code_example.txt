@@ -6,8 +6,8 @@ ventas <- read.csv("C:/Users/Khaleesi/Downloads/Tiendassample1.csv")
 ventas_s1 <- subset(ventas, ventas$Grupo =="sample1")
 ventas_s2 <- subset(ventas, ventas$Grupo =="sample2")
 
-ventas$Ventas.enero.feb.esc <-  ventas$Ventas.ene.feb/1000000
-ventas_s2$Ventas.enero.feb.esc <-  ventas_s2$Ventas.enero.feb/1000000
+ventas$Ventas.enero.feb.esc <-  ventas$Ventas.ene.feb
+ventas_s2$Ventas.enero.feb.esc <-  ventas_s2$Ventas.enero.feb
 
 ###########################
 ###   sample1 ANALYSIS   ###
